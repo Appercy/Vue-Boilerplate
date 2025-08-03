@@ -1,1 +1,0 @@
-import{_ as e}from"./_plugin-vue_export-helper-DlAUqK2U.js";import{c as t,o as s}from"./index-CSzC60j2.js";const c={};function o(r,n){return s(),t("p",null," this is site 1 ")}const i=e(c,[["render",o]]);export{i as default};

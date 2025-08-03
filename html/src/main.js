@@ -1,14 +1,15 @@
 import './assets/base.css'
 import { createApp } from 'vue'
 import App from './App.vue'
-import router from "./router"
+import router from './router'
 
-// import { OhVueIcon, addIcons } from "oh-vue-icons";
-// import { GiUnicorn } from "oh-vue-icons/icons";
-// addIcons(GiUnicorn)
-const app = createApp(App);
-//app.component("v-icon", OhVueIcon);
+// Create and mount the Vue app with router
+const app = createApp(App)
 app.use(router)
+
+// Make router available globally for FiveM navigation
+window.vueRouter = router
+
 app.mount('#app')
 
 

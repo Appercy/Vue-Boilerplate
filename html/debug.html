@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NUI Debug Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: rgba(0,0,0,0.8);
+            color: white;
+        }
+        .test-panel {
+            background: white;
+            color: black;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 400px;
+        }
+        button {
+            background: #007acc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #005a9e;
+        }
+        .log {
+            background: #f0f0f0;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-panel">
+        <h2>NUI Debug Test</h2>
+        <p>Resource Name: <span id="resourceName"></span></p>
+        
+        <button onclick="testCallback('exampleButton')">Test Example Button</button>
+        <button onclick="testCallback('spawnVehicle')">Test Spawn Vehicle</button>
+        <button onclick="testCallback('logNUIAction')">Test Log Action</button>
+        <button onclick="closeUI()">Close UI</button>
+        
+        <div class="log" id="log"></div>
+    </div>
+
+    <script>
+        function log(message) {
+            const logDiv = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            logDiv.innerHTML += `[${timestamp}] ${message}<br>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+            console.log(message);
+        }
+
+        function getResourceName() {
+            if (window.GetParentResourceName) {
+                return window.GetParentResourceName();
+            }
+            return 'NUI-Boilerplate';
+        }
+
+        document.getElementById('resourceName').textContent = getResourceName();
+
+        function testCallback(callbackName) {
+            const resourceName = getResourceName();
+            const url = `https://${resourceName}/${callbackName}`;
+            
+            log(`Testing ${callbackName} at ${url}`);
+            
+            let body = {};
+            if (callbackName === 'exampleButton') {
+                body = { buttonType: 'getData' };
+            } else if (callbackName === 'spawnVehicle') {
+                body = { model: 'adder' };
+            } else if (callbackName === 'logNUIAction') {
+                body = { action: 'requestServerData' };
+            }
+            
+            fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            })
+            .then(response => {
+                log(`Response: ${response.status} ${response.statusText}`);
+                return response.text();
+            })
+            .then(text => {
+                log(`Response text: ${text}`);
+                if (text) {
+                    try {
+                        const data = JSON.parse(text);
+                        log(`Parsed JSON: ${JSON.stringify(data)}`);
+                    } catch (e) {
+                        log(`JSON parse error: ${e.message}`);
+                    }
+                }
+            })
+            .catch(error => {
+                log(`Error: ${error.message}`);
+            });
+        }
+
+        function closeUI() {
+            fetch(`https://${getResourceName()}/closeUI`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({})
+            });
+        }
+
+        // Log when page loads
+        window.addEventListener('load', () => {
+            log('Debug page loaded successfully');
+            log(`Resource name: ${getResourceName()}`);
+        });
+    </script>
+</body>
+</html>
